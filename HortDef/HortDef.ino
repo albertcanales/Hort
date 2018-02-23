@@ -17,7 +17,7 @@ long t = 0;
 
 byte wateringFrequency = 8;
 byte timeWatering = 5;
-byte waterUnderHumidity = 30;
+byte maximiumHumidity = 80;
 
 
 void setup() {
@@ -61,7 +61,8 @@ void CheckReceivingData() {
 }
 
 void CheckWatering() {
-  if( millis() / (wateringFrequency * 3600000) != t || waterUnderHumidity > earthHumidity) {
+  earthHumidity = map(analogRead(WATER_SENSOR), 0, 750, 0, 100); 
+  if( millis() / (wateringFrequency * 3600000) != t &&  maximiumHumidity > earthHumidity) {
     t = millis() / (wateringFrequency * 3600000);
     WaterNow();
     }
@@ -72,12 +73,12 @@ void UpdateSensors() {
     bt.print(2);
     bt.print("|");
     Serial.print("Earth humidity: ");
-    earthHumidity = analogRead(WATER_SENSOR); 
+    earthHumidity = map(analogRead(WATER_SENSOR), 0, 750, 0, 100); 
     Serial.println(earthHumidity);
     bt.print(earthHumidity);
     bt.print("|");
     Serial.print("Light: ");
-    light = analogRead(LDR);
+    light = map(analogRead(LDR), 0, 1000, 0, 100);
     Serial.println(light);
     bt.print(light);
     bt.print("|");
@@ -107,8 +108,8 @@ void UpdateConfig() {
     bt.print(timeWatering); 
     bt.print("|");
     Serial.print("Water when humidity drops: ");
-    Serial.println(waterUnderHumidity);
-    bt.print(waterUnderHumidity);
+    Serial.println(maximiumHumidity);
+    bt.print(maximiumHumidity);
     Serial.println("");
   }
 
@@ -134,9 +135,9 @@ void SendConfig() {
   Serial.print("Time Watering: ");
   Serial.println(timeWatering);
   delay(100);
-  waterUnderHumidity = bt.read();
+  maximiumHumidity = bt.read();
   Serial.print("Water when humidity drops: ");
-  Serial.println(waterUnderHumidity);
+  Serial.println(maximiumHumidity);
   Serial.println("");
   delay(200);
   UpdateConfig();
